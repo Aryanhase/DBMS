@@ -1,0 +1,36 @@
+CREATE TABLE customers (
+	custid number(5) PRIMARY KEY, 
+	name varchar2(30), 
+	country varchar2(20) NOT NULL, 
+	age number(2)
+);
+
+CREATE TABLE orders (
+	oid number(5) PRIMARY KEY, 
+	item_name varchar(30), 
+	price number(10), 
+	custid number(5), 
+	CONSTRAINT fk_customer_order FOREIGN KEY (custid) 
+	REFERENCES customers(custid)
+);
+
+INSERT INTO customers VALUES (00001, 'Adam', 'India', 30);                     -- data insertion in customers table
+INSERT INTO customers VALUES (00002, 'Linus', 'Canada', 25);
+INSERT INTO customers VALUES (00003, 'Lew', 'Indonesia', 40);
+
+INSERT INTO orders VALUES (58940, 'Keyboard',5000, 1);                         --data insertion in customers table
+INSERT INTO orders VALUES (47895, 'Laptop', 80000, 2);
+
+UPDATE customers SET age = 41 WHERE custid = 3;                                   
+
+DELETE FROM orders WHERE oid = 45745;
+
+SELECT name FROM customers WHERE name LIKE 'A%';                                    --reteive the names of customers starting with A
+SELECT oid, (price+500) AS new_price FROM orders WHERE oid=58940;              -- to adjust the updated price of oid=58940
+SELECT * FROM orders WHERE price > 10000;							-- retrieve the orders having price greater than 10000
+SELECT * FROM customers WHERE age>20 AND country='INDIA';                         -- retrive the customers having age greater than 20
+SELECT custid, name FROM customers UNION SELECT oid, item_name FROM orders;          --The UNION operation ensures duplicates are removed, providing a distinct combined result.
+
+
+SELECT * FROM customer                  --retrieve the columns having not null value
+WHERE name IS NOT NULL;   

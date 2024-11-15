@@ -1,0 +1,43 @@
+CREATE TABLE customers (
+	custid number(5) PRIMARY KEY, 
+	name varchar2(30), 
+	country varchar2(20) NOT NULL, 
+	age number(2)
+);
+
+INSERT INTO customers VALUES(00001,'Om','India',21);                      -- insert data into customers table
+INSERT INTO customers VALUES(00002,'Ram','Japan',19);
+INSERT INTO customers VALUES(00003,'Jatin','USA',24);
+
+CREATE TABLE orders (                                                                       -- create order table 
+	oid number(5) PRIMARY KEY, 
+	item_name varchar(30), 
+	price number(10), 
+	custid number(5), 
+	CONSTRAINT fk_customer_order FOREIGN KEY (custid) 
+	REFERENCES customers(custid)
+);
+
+
+INSERT INTO orders VALUES(1,'Soap',50,00002);
+INSERT INTO orders VALUES(2,'Facewash',150,00003);
+INSERT INTO orders VALUES(3,'Oil',500,00001);
+
+CREATE VIEW cust_details AS                                                              -- view
+	SELECT name,
+	country,
+	age
+	FROM customers;
+
+CREATE INDEX idx_customer_name ON customers (name);                    -- index 
+
+ALTER TABLE orders DROP CONSTRAINT fk_customer_order;	                                                                                          --- used to remove a constraint named fk_customer_order from the orders table 
+
+ALTER TABLE orders ADD CONSTRAINT fk_customer_order FOREIGN KEY (custid) REFERENCES customers(custid);       -- used to add a foreign key constraint named fk_customer_order to the orders table.                                         																						           -- This constraint establishes a relationship between the orders table and the customers table
+
+TRUNCATE TABLE orders;            -- delete the data from order table 
+DROP VIEW cust_deatils;             -- delete view
+
+
+SELECT * FROM orders;                                  -- for data retrieve
+SELECT * FROM customers;				-- for data retrieve

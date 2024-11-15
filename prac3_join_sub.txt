@@ -1,0 +1,70 @@
+CREATE TABLE customers (
+	custid number(5) PRIMARY KEY, 
+	name varchar2(30), 
+	country varchar2(20) NOT NULL, 
+	age number(2)
+);
+
+
+INSERT INTO customers VALUES(00001,'Om','India',21);                     
+INSERT INTO customers VALUES(00002,'Ram','Japan',19);
+INSERT INTO customers VALUES(00003,'Jatin','USA',24);				 -- insert data into customers table
+
+
+CREATE TABLE orders (
+	oid number(5) PRIMARY KEY, 
+	item_name varchar(30), 
+	price number(10), 
+	custid number(5), 
+	CONSTRAINT fk_customer_order FOREIGN KEY (custid) 
+	REFERENCES customers(custid)
+);
+
+
+INSERT INTO orders VALUES(1,'Soap',50,00002);
+INSERT INTO orders VALUES(2,'Facewash',150,00003);
+INSERT INTO orders VALUES(3,'Oil',500,00001);
+
+
+CREATE VIEW cust_details AS                              
+	SELECT name, age, country 
+	FROM customers;									 -- creating view named as customer details
+
+SELECT customers.custid, customers.country, orders.oid                                   
+FROM customers
+INNER JOIN orders
+ON customers.custid = orders.custid;											--only return records where there is a matching value in both tables. 
+
+SELECT customers.custid, customers.country, orders.oid                            
+FROM customers
+LEFT OUTER JOIN orders
+ON customers.custid = orders.custid;									--all rows from the customers table will be included in the result set, even if there is no matching record
+
+SELECT customers.custid, customers.country, orders.oid                           
+FROM customers
+RIGHT OUTER JOIN orders
+ON customers.custid = orders.custid;									 --retrieves all the orders, along with the customer details (like custid and country), if available.
+
+SELECT customers.custid, customers.country, orders.oid                                 
+FROM customers
+FULL OUTER JOIN orders
+ON customers.custid = orders.custid;								   --retrieves all rows from both the customers and orders tables, combining them where possible based on the custid    
+
+SELECT * FROM customers WHERE age = (SELECT MIN(age) FROM customers);          -- returns the minimum value of the age column in the customers table.
+SELECT * FROM customers WHERE custid IN (SELECT custid FROM orders);                 --  retrieves the customer IDs from the orders table.
+SELECT name, age FROM customers WHERE EXISTS (SELECT oid FROM orders WHERE customers.custid=orders.custid);       -- checks the custid from both tables for order associated with current customer 
+
+
+SELECT 																	
+    o.item_name,
+    (SELECT c.name FROM customers c WHERE c.custid = o.custid) AS customer_name,
+    (SELECT c.country FROM customers c WHERE c.custid = o.custid) AS customer_country
+FROM 
+    orders o;																-- correlated subquery in the SELECT statement to retrieve additional information  from the customers table,              																			based on the custid present in the orders table.
+
+
+SELECT customers.name, customers.country, orders.item_name
+FROM customers
+INNER JOIN orders
+ON customers.custid=orders.custid;       												--This query retrieves the name and country of customers, along with the item_name of the orders they have 																				placed, using an INNER JOIN between the customers and orders tables.                                                                                                 
+
