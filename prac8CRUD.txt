@@ -1,0 +1,32 @@
+use newdb;
+show dbs;
+
+db.createCollection("employee");
+
+db.employee.insert({_id:1, firstName:"Aryan"});
+db.employee.insert({_id:2, firstName:"Bhushan", salary:1000});
+db.employee.insert({_id:3, firstName:"Chetan", salary:2000});
+db.employee.insert({_id:4, firstName:"Adam", salary:4000});
+
+db.employee.find();
+
+db.employee.find().pretty();
+
+db.employee.find().limit(2);
+db.employee.find().skip(1);
+db.employee.find().skip(1)limit(2);
+
+db.employee.find({salary: {$gte:1000} }).limit(2);
+
+db.employee.update({_id:1}, {$set: {firstName:"Aryan_updated"} });
+db.employee.update({firstName:"Bhushan"},{$set: {id:22} });
+
+db.employee.remove({_id:1});
+db.employee.remove({firstNamae: "Adam"});
+
+db.employee.remove({});
+db.employee.drop();
+
+db.employee.find({}, {firstName: 1});
+db.employee.find({}, {firstName: 1, salary: 1});
+db.employee.find({},{_id: 0,firstName: 1, salary: 1});
