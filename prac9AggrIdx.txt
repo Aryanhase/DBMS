@@ -1,0 +1,27 @@
+use newdb;
+show dbs;
+
+db.createCollection("employee");
+
+
+db.employee.insert({_id : 1, firstName:"name1", "department": "IT",  salary: 4000 }); 
+db.employee.insert({_id : 2, firstName:"name1", "department": "COMP", salary : 8000 }); 
+db.employee.insert({_id : 3, firstName:"name1", "department": "ENTC", salary: 7000 }); 
+db.employee.insert({_id : 4, firstName:"name2", "department": "COMP", salary : 2000 });
+db.employee.insert({_id : 5, firstName:"name2", "department": "IT", salary: 2000 });
+
+db.employee.aggregate([{$group: {_id:"$firstName", countOfEmp: {sum: 1} } } ]);
+db.employee.count();
+db.employee.find({salary: {gte: 1000}).count();
+
+db.employee.aggregate([{$group: {_id: "$firstName", salary_sum: {$sum: "$salary"} } } ]); (sum of salary of emps grouped by name)
+db.employee.aggregate([{$group: {_id: null, salary_sum: {$sum: "$salary"} } } ]); (sum of salary of all emps)
+db.employee.aggregate([{$match: {salary: {gte: 1000} } }, {$group: {_id: "$firstName", salary_sum: {$sum: "$salary"} } } ]); (same name sal sum)
+
+db.employees.createIndex({ department: 1 }); 
+
+db.employees.getIndexes();
+
+
+
+
