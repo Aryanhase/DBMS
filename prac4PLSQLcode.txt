@@ -1,0 +1,62 @@
+CREATE TABLE Borrower (
+    Roll_no NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR2(100),
+    Status CHAR(1) CHECK (Status IN ('I', 'R'))
+);	                    															--insert data only in borrower table
+
+CREATE TABLE Fine (
+    Roll_no NUMBER,
+    date_r DATE,
+    Amt NUMBER,
+    FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+
+
+INSERT INTO Borrower VALUES (1, 'aryan', TO_DATE('2024-10-01', 'YYYY-MM-DD'), 'Introduction to SQL', 'I');
+INSERT INTO Borrower VALUES (2, 'avadhoot', TO_DATE('2024-10-10', 'YYYY-MM-DD'), 'Advanced Database Systems', 'I');
+INSERT INTO Borrower VALUES (3, 'om', TO_DATE('2024-10-15', 'YYYY-MM-DD'), 'Data Science Handbook', 'R');
+
+
+DECLARE
+	v_roll_no NUMBER;
+	v_book_name VARCHAR2(100);
+	v_date_of_issue DATE;
+	v_days NUMBER;
+	v_fine_amt NUMBER := 0;
+BEGIN
+	v_roll_no := &roll_no;
+	v_book_name := '&book_name';
+	
+	SELECT DateofIssue INTO v_date_of_issue
+	FROM borrower 
+	WHERE Roll_no = v_roll_no AND NameofBook = v_book_name AND Status = 'I';
+
+	v_days := TRUNC(SYSDATE-v_date_of_issue);
+
+	IF v_days BETWEEN 15 AND 30 THEN
+		v_fine_amt := v_days*5;
+	ELSIF v_days>30 THEN
+		v_fine_amt := v_days*50;
+	END IF;
+
+	UPDATE borrower
+	SET Status = 'R'
+	WHERE NameofBook = v_book_name;
+
+	IF v_fine_amt>0 THEN
+		INSERT INTO fine (Roll_no, date_r, Amt)
+		VALUES (v_roll_no, SYSDATE, v_fine_amt);
+	END IF;
+
+	COMMIT;
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN 
+		dbms_output.Put_line('No data found');
+	WHEN OTHERS THEN
+		dbms_output.put_line('An error occured');
+END;
+/                                                                                                                        --code asks attribute to execute it like a normal codes
+

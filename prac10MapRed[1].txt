@@ -1,0 +1,24 @@
+
+
+
+db.records.insert({rollno:1, name:"Aryan", subj: "TOC", marks: 80 });
+
+var mappingFunction = function(){emit(this.subj, this.marks)};
+
+var reduceFunction = function(key, marks){
+	var result = {max:0, min:1000, avg:0};
+	marks.forEach(function(value){
+	if(value>result.max){
+	result.max=value;
+	}
+	if(value<result.min){
+	result.min=value;
+	}
+	})
+	result.avg=Array.avg(marks);
+	return result;
+	}
+
+db.records.mapReduce(mappingFunction, reduceFunction, {out:"result"});
+
+db.result.find();
