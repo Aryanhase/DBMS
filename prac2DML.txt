@@ -34,3 +34,19 @@ SELECT custid, name FROM customers UNION SELECT oid, item_name FROM orders;     
 
 SELECT * FROM customer                  --retrieve the columns having not null value
 WHERE name IS NOT NULL;   
+
+SELECT * FROM customer                  --retrieve the columns having not null value
+WHERE name IS NOT NULL;
+
+SELECT COUNT(custid), country
+FROM customer
+GROUP BY country;
+
+SELECT * FROM customers
+ORDER BY price;                               -- for descending: ORDER BY price DESC;   
+
+
+SELECT COUNT(custid), country
+FROM customers
+GROUP BY country
+HAVING COUNT(custid) > 1;
