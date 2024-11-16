@@ -9,21 +9,37 @@ CREATE TABLE O_RollCall (
 );
 
 
---parameterized cursor
-DECLARE                                      
-	CURSOR new_data_cursor(p_roll_no NUMBER) IS
+-- Insert sample data into N_RollCall
+INSERT INTO N_RollCall (roll_no, name) VALUES (1, 'Alice');
+INSERT INTO N_RollCall (roll_no, name) VALUES (2, 'Bob');
+INSERT INTO N_RollCall (roll_no, name) VALUES (3, 'Charlie');
+
+-- Insert sample data into O_RollCall
+INSERT INTO O_RollCall (roll_no, name) VALUES (2, 'Bob');
+INSERT INTO O_RollCall (roll_no, name) VALUES (4, 'Daisy');
+
+-- Commit the data
+
+DECLARE
+	CURSOR n_data_cursor(p_roll_no NUMBER) IS
 		SELECT roll_no, name
 		FROM N_RollCall
 		WHERE roll_no = p_roll_no;
 
+    CURSOR o_data_cursor(p_roll_no NUMBER) IS
+        SELECT roll_no, name
+        FROM O_RollCall
+        WHERE roll_no = p_roll_no;
+    
 	v_roll_no NUMBER;
 	v_name VARCHAR2(50);
 	v_exists NUMBER := 0;
 BEGIN
-	FOR new_record IN (SELECT roll_no, name FROM N_RollCall) LOOP
 	
-		OPEN new_data_cursor(new_record.roll_no);
-		FETCH new_data_cursor INTO v_roll_no,v_name;
+    FOR new_record IN (SELECT roll_no, name FROM N_RollCall) LOOP
+	
+		OPEN n_data_cursor(new_record.roll_no);
+		FETCH n_data_cursor INTO v_roll_no,v_name;
 
 		SELECT COUNT(*) INTO v_exists
 		FROM O_RollCall
@@ -34,18 +50,30 @@ BEGIN
 			INSERT INTO O_RollCall (roll_no, name)
 			VALUES (new_record.roll_no, new_record.name);
 		END IF;
-		CLOSE new_data_cursor;
+		CLOSE n_data_cursor;
 	END LOOP;
-	COMMIT;
+	v_exists := 0;
+    FOR old_record in (select roll_no, name from O_RollCall ) LOOP
+
+        OPEN o_data_cursor(old_record.roll_no);
+        FETCH o_data_cursor into v_roll_no, v_name;
+
+        select COUNT(*) INTO v_exists 
+        FROM N_RollCall 
+        WHERE roll_no = old_record.roll_no;
+
+        if v_exists=0 then
+            insert into n_rollcall(roll_no, name)
+            values (old_record.roll_no,old_record.name);
+        end if;
+        close o_data_cursor;
+    end loop;
+
+    COMMIT;
 END;
 
--- Insert sample data into N_RollCall
-INSERT INTO N_RollCall (roll_no, name) VALUES (1, 'Alice');
-INSERT INTO N_RollCall (roll_no, name) VALUES (2, 'Bob');
-INSERT INTO N_RollCall (roll_no, name) VALUES (3, 'Charlie');
-
--- Insert sample data into O_RollCall
-INSERT INTO O_RollCall (roll_no, name) VALUES (2, 'Bob');
-INSERT INTO O_RollCall (roll_no, name) VALUES (4, 'Daisy');
+SELECT * from O_ROLLCALL;
+select * from N_ROLLCALL;
+COMMIT;
 
 --first create two tables then insert data in them, then write cursor code block and simply retrive old table via select query
